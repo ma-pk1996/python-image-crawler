@@ -1,15 +1,25 @@
-import scrapy
+import requests
+from bs4 import BeautifulSoup
+import json
 
-class PexelsSpider(scrapy.Spider):
-    name = "pexels"
-    start_urls = [
-        'https://unsplash.com/s/photos/knife'
-    ]
+url = 'https://unsplash.com/s/photos/knife'
+response = requests.get(url)
+soup = BeautifulSoup(response.content, 'html.parser')
+images = soup.select('img[src]')
 
-    def parse(self, response):
-        for index in range(1, 11):
-            xpath = f'/html/body/div/div/div[1]/div/div[2]/div[4]/div/div[1]/div[2]/div/div/div[1]/div/div/div[{index}]/figure[2]/div/div[1]/div/div/a/div/div[2]/img'
-            image_url = response.xpath(xpath + '/@src').get()
-            yield {
-                'image_urls': [image_url]
-            }
+filtered_urls = []
+patterns = [
+    'https://media.istockphoto.com/id/',
+    'https://plus.unsplash.com/premium_photo-',
+    'https://images.unsplash.com/photo-'
+]
+
+for img in images:
+    src = img['src']
+    for pattern in patterns:
+        if src.startswith(pattern):
+            filtered_urls.append(src)
+            break
+
+with open('filtered_urls.json', 'w') as file:
+    json.dump(filtered_urls, file)
