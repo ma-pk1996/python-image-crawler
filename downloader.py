@@ -19,7 +19,7 @@ def download_images(url_file, output_folder):
         else:
             print(f'Error downloading image from URL: {url}')
 
-# Example usage
+
 json_file = 'filtered_urls.json'
 output_folder = 'download'
 
